@@ -4,6 +4,7 @@
   "description": "Powerful solution to track all investments at Bovespa",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "npm test"
   },
   "author": "Carlos Leal",
