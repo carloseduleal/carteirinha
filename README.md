@@ -20,7 +20,7 @@ npm start
 
 ## TODO
 
-* Unit testing
-* API testing
-* Lint (checkstyle)
-* Istanbul (coverage)
+- [ ] Unit testing
+- [ ] API testing
+- [ ] Lint (checkstyle)
+- [ ] Istanbul (coverage)
