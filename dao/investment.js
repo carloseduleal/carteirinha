@@ -28,7 +28,7 @@ module.exports = function(app) {
         },
         getById: function(id, callback) {
             investments.findOne({
-                "_id": new ObjectId(id)
+                _id: ObjectId(id)
             }, callback);
         }
     };
