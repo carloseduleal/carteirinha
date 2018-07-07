@@ -1,4 +1,5 @@
 const app = require('../index.js');
+const objectId = require('mongodb').ObjectID;
 
 module.exports = function(app) {
     const investmentsCollection = app.dao.investment;
@@ -23,22 +24,30 @@ module.exports = function(app) {
             });
         },
         getSingleInvestmentFromDatabase: function(id, callback) {
-            investmentsCollection.getById(id, function(err, result) {
-                if (err) {
-                    console.log("Error while getting single investment from database");
-                    console.log(err);
-                }
-                callback(err, result);
-            });
+            if (objectId.isValid(id)){
+              investmentsCollection.getById(id, function(err, result) {
+                  if (err) {
+                      console.log("Error while getting single investment from database");
+                      console.log(err);
+                  }
+                  callback(err, result);
+              });
+            } else {
+              callback('OBJECTID IS NOT VALID', null);
+            }
         },
         deleteSingleInvestmentFromDatabase: function(id, callback) {
-            investmentsCollection.remove(id, function(err, result) {
-                if (err) {
-                    console.log("Error while deleting single investment from database");
-                    console.log(err);
-                }
-                callback(err, result);
-            });
+            if (objectId.isValid(id)){
+              investmentsCollection.remove(id, function(err, result) {
+                  if (err) {
+                      console.log("Error while deleting single investment from database");
+                      console.log(err);
+                  }
+                  callback(err, result);
+              });
+           } else {
+             callback('OBJECTID IS NOT VALID', null);
+           }
         }
     };
     return investmentService;

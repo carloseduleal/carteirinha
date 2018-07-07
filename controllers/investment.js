@@ -50,24 +50,37 @@ module.exports = function(app) {
                 if (err) {
                     res.status(404);
                     res.send({
-                      "message":"Investment not found!"
+                      "message":"ID must be an ObjectID."
                     });
                     return;
                 }
-                res.send(result).status(200);
+                if (result){
+                  res.send(result).status(200);
+                } else {
+                  res.send({
+                    "message":"Investment not found."
+                  }).status(404);
+                }
             });
         },
         deleteSingleInvestment: function(req, res) {
             investmentService.deleteSingleInvestmentFromDatabase(req.params.id, function(err, result) {
-                if (err) {
-                    res.status(404);
-                    res.send({
-                      "message":"Investment not found!"
-                    });
-                    return;
-                }
-                res.status(204);
-                res.send("");
+              if (err) {
+                  res.status(404);
+                  res.send({
+                    "message":"ID must be an ObjectID."
+                  });
+                  return;
+              }
+              if (result){
+                res.send({
+                  "message":"Investment succesfully deleted"
+                }).status(200);
+              } else {
+                res.send({
+                  "message":"Investment not found."
+                }).status(404);
+              }
             });
         },
         showProfit: function(req, res) {
