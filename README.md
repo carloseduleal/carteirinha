@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/carloseduleal/carteirinha.svg?style=svg)](https://circleci.com/gh/carloseduleal/carteirinha)
+[![CircleCI](https://circleci.com/gh/carloseduleal/carteirinha.svg?style=shield)](https://circleci.com/gh/carloseduleal/carteirinha)
 
 # CARTEIRINHA
 
