@@ -1,10 +1,11 @@
 'use strict';
 
 const app = require('../index.js');
-const chai = require('chai');
-const request = require('supertest');
+const chai = require('chai')
+  ,chaiHttp = require('chai-http');
 const faker = require('faker');
 const expect = require('chai').expect
+chai.use(chaiHttp);
 
 describe('Investment test suite', function() {
   it('it should create a new invesment', function(done) {
@@ -19,14 +20,15 @@ describe('Investment test suite', function() {
       amount: fakeAmount
     };
 
-    request(app)
+    chai.request(app)
       .post('/api/investment')
       .send(investmentJson)
       .end(function(err, res) {
         expect(res.body.symbol).to.be.equal(fakeSymbol)
         expect(res.body.price).to.be.equal(fakePrice)
         expect(res.body.amount).to.be.equal(fakeAmount)
-        expect(400,done());
+        expect(res).to.have.status(203);
+        done();
       });
   });
 });
