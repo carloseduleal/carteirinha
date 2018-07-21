@@ -2,10 +2,8 @@ const mongoose = require('mongodb').MongoClient;
 let _db;
 
 module.exports = {
-    // _db: undefined,
     ConnectWithDB: function(callback) {
         mongoose.connect('mongodb://127.0.0.1:27017', function(err, db) {
-            // mongoose.connect('localhost:28017', function( err, db ) {
             _db = db;
             db.once('error', function(error) {
                 console.log(error);

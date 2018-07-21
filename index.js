@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const requestify = require('requestify');
 const load = require('express-load');
 const database = require('./config/database.js');
-
 const app = express();
 
 database.ConnectWithDB(function(err) {
@@ -19,6 +18,8 @@ process.env.TZ = 'America/Recife';
 
 app.use(bodyParser.json())
 
-app.listen(3000, function() {
+app.listen(5000, function() {
     console.log('Working at port 3000')
 })
+
+module.exports = app;
