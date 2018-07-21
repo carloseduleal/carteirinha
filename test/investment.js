@@ -26,7 +26,7 @@ describe('Investment test suite', function() {
         expect(res.body.symbol).to.be.equal(fakeSymbol)
         expect(res.body.price).to.be.equal(fakePrice)
         expect(res.body.amount).to.be.equal(fakeAmount)
-        expect(200,done());
+        expect(400,done());
       });
   });
 });
