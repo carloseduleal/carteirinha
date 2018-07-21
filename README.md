@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/carloseduleal/carteirinha.svg?style=svg)](https://circleci.com/gh/carloseduleal/carteirinha)
+
 # CARTEIRINHA
 
 ## INSTALL DEPENDENCIES
