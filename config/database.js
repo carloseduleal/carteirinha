@@ -1,5 +1,5 @@
 const mongoose = require('mongodb').MongoClient;
-let _db;
+var _db;
 
 module.exports = {
     ConnectWithDB: function(callback) {
