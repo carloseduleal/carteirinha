@@ -8,6 +8,7 @@ const expect = require('chai').expect
 
 describe('Investment test suite', function() {
   it('it should create a new invesment', function(done) {
+
     const fakeSymbol = faker.company.companyName();
     const fakePrice = faker.finance.amount();
     const fakeAmount = faker.finance.amount();
@@ -25,7 +26,7 @@ describe('Investment test suite', function() {
         expect(res.body.symbol).to.be.equal(fakeSymbol)
         expect(res.body.price).to.be.equal(fakePrice)
         expect(res.body.amount).to.be.equal(fakeAmount)
-        done();
+        expect(200,done());
       });
   });
 });
