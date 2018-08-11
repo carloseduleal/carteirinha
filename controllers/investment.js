@@ -50,53 +50,74 @@ module.exports = function(app) {
                 if (err) {
                     res.status(404);
                     res.send({
-                      "message":"ID must be an ObjectID."
+                        "message": "ID must be an ObjectID."
                     });
                     return;
                 }
-                if (result){
-                  res.send(result).status(200);
+                if (result) {
+                    res.send(result).status(200);
                 } else {
-                  res.send({
-                    "message":"Investment not found."
-                  }).status(404);
+                    res.send({
+                        "message": "Investment not found."
+                    }).status(404);
                 }
             });
         },
         deleteSingleInvestment: function(req, res) {
             investmentService.deleteSingleInvestmentFromDatabase(req.params.id, function(err, result) {
-              if (err) {
-                  res.status(404);
-                  res.send({
-                    "message":"ID must be an ObjectID."
-                  });
-                  return;
-              }
-              if (result){
-                res.send({
-                  "message":"Investment succesfully deleted"
-                }).status(200);
-              } else {
-                res.send({
-                  "message":"Investment not found."
-                }).status(404);
-              }
+                if (err) {
+                    res.status(404);
+                    res.send({
+                        "message": "ID must be an ObjectID."
+                    });
+                    return;
+                }
+                if (result) {
+                    res.send({
+                        "message": "Investment succesfully deleted"
+                    }).status(200);
+                } else {
+                    res.send({
+                        "message": "Investment not found."
+                    }).status(404);
+                }
             });
         },
-        showProfit: function(req, res) {
-            requestify.get('http://localhost:3000/api/investment/' + req.params.id).then(function(response) {
-                console.log(response.getBody())
-                var actualInvestment = response.getBody();
-                requestify.get('http://localhost:3000/api/status/' + actualInvestment.symbol).then(function(response) {
-                    console.log(response.getBody())
-                    var currentStatus = response.getBody();
-                    var worthIt = (currentStatus.currentPrice * actualInvestment.amount) - (actualInvestment.price * actualInvestment.amount)
+        showFullProfit: async function(req, res) {
+                var symbols = []
+                var status = []
+                var resultSum = ""
+
+                //GET ALL INVESTMENTS
+                var investments = await requestify.get('http://localhost:5000/api/investments/')
+
+                investments.getBody().forEach(async function(investment) {
+                    //FOR EACH INVESTMENT GET CURRENT VALUE
+                    var result = await requestify.get('http://localhost:5000/api/status/' + investment.symbol)
+                    var resultParsed = result.getBody()
+                    resultSum = resultSum + (resultParsed.currentPrice * investment.amount) - (investment.price * investment.amount)
+                })
+
+                setTimeout(function() {
                     res.send({
-                        value: worthIt
-                    }).status(200)
+                        "profit": resultSum
+                    }).status(200);
+                }, 10000);
+            },
+            showSingleProfit: function(req, res) {
+                requestify.get('http://localhost:5000/api/investment/' + req.params.id).then(function(response) {
+                    console.log(response.getBody())
+                    var actualInvestment = response.getBody();
+                    requestify.get('http://localhost:5000/api/status/' + actualInvestment.symbol).then(function(response) {
+                        console.log(response.getBody())
+                        var currentStatus = response.getBody();
+                        var worthIt = (currentStatus.currentPrice * actualInvestment.amount) - (actualInvestment.price * actualInvestment.amount)
+                        res.send({
+                            value: worthIt
+                        }).status(200)
+                    });
                 });
-            });
-        }
+            }
     }
     return controller;
 };

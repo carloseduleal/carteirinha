@@ -6,5 +6,6 @@ module.exports = function(app) {
     app.get(PREFIX + '/investments', app.controllers.investment.listAllInvestments);
     app.get(PREFIX + '/investment/:id', app.controllers.investment.listSingleInvestment);
     app.delete(PREFIX + '/investment/:id', app.controllers.investment.deleteSingleInvestment);
-    app.get(PREFIX + '/profit/:id', app.controllers.investment.showProfit);
+    app.get(PREFIX + '/profit', app.controllers.investment.showFullProfit);
+    app.get(PREFIX + '/profit/:id', app.controllers.investment.showSingleProfit);
 }
