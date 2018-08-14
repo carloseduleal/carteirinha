@@ -84,40 +84,31 @@ module.exports = function(app) {
             });
         },
         showFullProfit: async function(req, res) {
-                var symbols = []
-                var status = []
-                var resultSum = ""
+            var resultSum = ""
+            var investments = await requestify.get('http://localhost:5000/api/investments/')
+            investments = investments.getBody()
 
-                //GET ALL INVESTMENTS
-                var investments = await requestify.get('http://localhost:5000/api/investments/')
-
-                investments.getBody().forEach(async function(investment) {
-                    //FOR EACH INVESTMENT GET CURRENT VALUE
-                    var result = await requestify.get('http://localhost:5000/api/status/' + investment.symbol)
-                    var resultParsed = result.getBody()
-                    resultSum = resultSum + (resultParsed.currentPrice * investment.amount) - (investment.price * investment.amount)
-                })
-
-                setTimeout(function() {
-                    res.send({
-                        "profit": resultSum
-                    }).status(200);
-                }, 10000);
-            },
-            showSingleProfit: function(req, res) {
-                requestify.get('http://localhost:5000/api/investment/' + req.params.id).then(function(response) {
-                    console.log(response.getBody())
-                    var actualInvestment = response.getBody();
-                    requestify.get('http://localhost:5000/api/status/' + actualInvestment.symbol).then(function(response) {
-                        console.log(response.getBody())
-                        var currentStatus = response.getBody();
-                        var worthIt = (currentStatus.currentPrice * actualInvestment.amount) - (actualInvestment.price * actualInvestment.amount)
-                        res.send({
-                            value: worthIt
-                        }).status(200)
-                    });
-                });
+            for (var i = 0; i < investments.length; i++) {
+                var result = await requestify.get('http://localhost:5000/api/status/' + investments[i].symbol)
+                resultSum = resultSum + (result.getBody().currentPrice * investments[i].amount) - (investments[i].price * investments[i].amount)
             }
+
+            res.send({
+                "profit": resultSum
+            }).status(200);
+        },
+        showSingleProfit: async function(req, res) {
+            var storedInvestment = await requestify.get('http://localhost:5000/api/investment/' + req.params.id)
+            storedInvestment = storedInvestment.getBody()
+            var currentValueFromInvestment = await requestify.get('http://localhost:5000/api/status/' + storedInvestment.symbol)
+            currentValueFromInvestment = currentValueFromInvestment.getBody()
+
+            var worthIt = (currentValueFromInvestment.currentPrice * storedInvestment.amount) - (storedInvestment.price * storedInvestment.amount)
+
+            res.send({
+                value: worthIt
+            }).status(200)
+        }
     }
     return controller;
 };
