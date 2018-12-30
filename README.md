@@ -20,9 +20,14 @@ mongod --dbpath=/db/data
 npm start
 ```
 
+### Testing
+```
+npm test
+```
+
 ## TODO
 
 - [ ] Unit testing
-- [ ] API testing
+- [ X ] API testing
 - [ ] Lint (checkstyle)
 - [ ] Istanbul (coverage)
