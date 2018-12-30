@@ -1,9 +1,8 @@
 const app = require('../index.js');
 const yahooFinance = require('yahoo-finance');
-const requestify = require('requestify');
+const utils = require('../utils/utils')
 
 module.exports = function(app) {
-
     const investmentService = app.service.investment;
 
     const controller = {
@@ -12,14 +11,14 @@ module.exports = function(app) {
                 symbol: req.params.symbol + ".SA",
                 modules: ['price']
             }, function(err, quotes) {
-                this.priceVariation = quotes.price.regularMarketPrice - quotes.price.regularMarketPreviousClose
-                this.variation = this.priceVariation / quotes.price.regularMarketPreviousClose * 100
+                const priceVariation = quotes.price.regularMarketPrice - quotes.price.regularMarketPreviousClose
+                const variation = this.priceVariation / quotes.price.regularMarketPreviousClose * 100
                 res.send({
                     'name': quotes.price.longName,
                     'currentPrice': quotes.price.regularMarketPrice,
                     'latestClose': quotes.price.regularMarketPreviousClose,
-                    'priceVariation': this.priceVariation.toFixed(2),
-                    'variation': this.variation.toFixed(2)
+                    'priceVariation': priceVariation.toFixed(2),
+                    'variation': variation.toFixed(2)
                 }).status(200);
             });
         },
@@ -66,10 +65,9 @@ module.exports = function(app) {
         deleteSingleInvestment: function(req, res) {
             investmentService.deleteSingleInvestmentFromDatabase(req.params.id, function(err, result) {
                 if (err) {
-                    res.status(404);
                     res.send({
                         "message": "ID must be an ObjectID."
-                    });
+                    }).status(404);
                     return;
                 }
                 if (result) {
@@ -84,30 +82,50 @@ module.exports = function(app) {
             });
         },
         showFullProfit: async function(req, res) {
-            var resultSum = ""
-            var investments = await requestify.get('http://localhost:5000/api/investments/')
-            investments = investments.getBody()
-
-            for (var i = 0; i < investments.length; i++) {
-                var result = await requestify.get('http://localhost:5000/api/status/' + investments[i].symbol)
-                resultSum = resultSum + (result.getBody().currentPrice * investments[i].amount) - (investments[i].price * investments[i].amount)
-            }
-
-            res.send({
-                "profit": resultSum
-            }).status(200);
+            let resultSum = ""
+            investmentService.getInvestmentsFromDatabase(async function(err, investments) {
+                if (err) {
+                    res.send({
+                        "message": "Something goes wrong trying to get investments from database. Try again later."
+                    }).status(401);
+                    return;
+                }  
+                
+                await utils.asyncForEach(investments, async (investment) => {
+                    await yahooFinance.quote({
+                        symbol: investment.symbol + ".SA",
+                        modules: ['price']
+                    }, function(err, quotes) {
+                        let priceVariation = quotes.price.regularMarketPrice - quotes.price.regularMarketPreviousClose
+                        let variation = priceVariation / quotes.price.regularMarketPreviousClose * 100
+                        let investment_status = {
+                            'name': quotes.price.longName,
+                            'currentPrice': quotes.price.regularMarketPrice,
+                            'latestClose': quotes.price.regularMarketPreviousClose,
+                            'priceVariation': priceVariation.toFixed(2),
+                            'variation': variation.toFixed(2)
+                        }
+                        resultSum = resultSum + (investment_status.currentPrice * investment.amount) - (investment.price * investment.amount)
+                    });
+                })    
+                res.send({
+                    "profit": resultSum
+                }).status(200);  
+            })
         },
         showSingleProfit: async function(req, res) {
-            var storedInvestment = await requestify.get('http://localhost:5000/api/investment/' + req.params.id)
-            storedInvestment = storedInvestment.getBody()
-            var currentValueFromInvestment = await requestify.get('http://localhost:5000/api/status/' + storedInvestment.symbol)
-            currentValueFromInvestment = currentValueFromInvestment.getBody()
-
-            var worthIt = (currentValueFromInvestment.currentPrice * storedInvestment.amount) - (storedInvestment.price * storedInvestment.amount)
-
-            res.send({
-                value: worthIt
-            }).status(200)
+            let worthIt = ""
+            investmentService.getSingleInvestmentFromDatabase(req.params.id, async function(err, result) {
+                await yahooFinance.quote({
+                    symbol: result.symbol + ".SA",
+                    modules: ['price']
+                }, function(err, quotes) {
+                    worthIt = (quotes.price.regularMarketPrice * result.amount) - (result.price * result.amount)
+                });
+                res.send({
+                    value: worthIt
+                }).status(200)
+            });
         }
     }
     return controller;
