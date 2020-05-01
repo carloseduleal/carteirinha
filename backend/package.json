@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "mocha --exit"
+    "test": "mocha --exit",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "author": "Carlos Leal",
   "license": "ISC",
@@ -22,6 +24,8 @@
     "body-parser": "^1.18.3",
     "faker": "^4.1.0",
     "requestify": "^0.2.5",
-    "yahoo-finance": "^0.3.5"
-  }
+    "yahoo-finance": "^0.3.5",
+    "snyk": "^1.316.1"
+  },
+  "snyk": true
 }
